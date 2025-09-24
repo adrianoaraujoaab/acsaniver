@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harry Styles: Adivinhe a Música</title>
+    <style>
+        body {
+            font-family: 'Georgia', serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #4b0082; /* Roxo escuro */
+            text-align: center;
+            
+            /* --- CÓDIGO PARA A FOTO DE FUNDO --- */
+            background-image: url('https://www.rollingstone.com/wp-content/uploads/2020/12/harry-styles-watermelon-sugar.jpg?w=1000'); /* Exemplo de URL de foto */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+        .container {
+            /* Deixa a caixa de conteúdo semi-transparente para ver o fundo */
+            background-color: rgba(255, 255, 255, 0.7); 
+            padding: 2em;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+        }
+        h1 {
+            color: #d81b60; /* Rosa mais forte */
+            font-family: 'Arial', sans-serif;
+        }
+        #lyrics-text {
+            font-size: 1.5em;
+            font-style: italic;
+            margin-bottom: 1em;
+            color: #880e4f;
+        }
+        #user-input {
+            width: 80%;
+            padding: 0.8em;
+            border: 2px solid #d81b60;
+            border-radius: 8px;
+            font-size: 1em;
+            text-align: center;
+        }
+        .buttons {
+            margin-top: 1em;
+            display: flex;
+            justify-content: center;
+            gap: 1em;
+        }
+        button {
+            padding: 0.8em 1.5em;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-weight: bold;
+        }
+        #check-btn {
+            background-color: #d81b60;
+            color: white;
+        }
+        #check-btn:hover {
+            background-color: #ad1457;
+        }
+        #next-btn {
+            background-color: #4b0082;
+            color: white;
+        }
+        #next-btn:hover {
+            background-color: #310057;
+        }
+        #result {
+            margin-top: 1em;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .correct {
+            color: #2e7d32;
+        }
+        .incorrect {
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Adivinhe a Música do Harry!</h1>
+    <p>Leia a letra e digite o nome da música.</p>
+    <p id="lyrics-text"></p>
+    <input type="text" id="user-input" placeholder="Digite o nome da música">
+    
+    <div class="buttons">
+        <button id="check-btn">Verificar</button>
+        <button id="next-btn" style="display: none;">Próxima Música</button>
+    </div>
+
+    <p id="result"></p>
+</div>
+
+<script>
+    // Lista de músicas com letras (TOP 10)
+    const songs = [
+        {
+            lyrics: "In this world, it's just us. You know it's not the same as it was.",
+            answer: "As It Was"
+        },
+        {
+            lyrics: "I want your belly, and that summer feelin'.",
+            answer: "Watermelon Sugar"
+        },
+        {
+            lyrics: "I'd walk through fire for you, just let me adore you.",
+            answer: "Adore You"
+        },
+        {
+            lyrics: "You're so golden, I'm out of my head, and I know that you're scared.",
+            answer: "Golden"
+        },
+        {
+            lyrics: "Just stop your crying, it's a sign of the times.",
+            answer: "Sign of the Times"
+        },
+        {
+            lyrics: "I'm just a fool, fallin' again, fallin' for you.",
+            answer: "Falling"
+        },
+        {
+            lyrics: "I'm in my bed and you're not here. And there's no one to blame but the drink and my wandering hands.",
+            answer: "Falling"
+        },
+        {
+            lyrics: "Lights up and they know who you are. Do you know who you are?",
+            answer: "Lights Up"
+        },
+        {
+            lyrics: "I could have my own way, but I want to stay here with you.",
+            answer: "Late Night Talking"
+        },
+        {
+            lyrics: "Daylight, you got me feelin' on a high.",
+            answer: "Daylight"
+        },
+        {
+            lyrics: "I just wanna know what you're thinking. Say you're thinking of me.",
+            answer: "Daylight"
+        },
+        {
+            lyrics: "Don't you know you love this feelin' now?",
+            answer: "Watermelon Sugar"
+        },
+        {
+            lyrics: "The girl had a crush on a boy that's a Kiwi.",
+            answer: "Kiwi"
+        }
+    ];
+
+    let currentSongIndex;
+
+    const lyricsText = document.getElementById('lyrics-text');
+    const userInput = document.getElementById('user-input');
+    const checkBtn = document.getElementById('check-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const resultText = document.getElementById('result');
+
+    // Função para mostrar uma música aleatória
+    function displayRandomSong() {
+        const randomIndex = Math.floor(Math.random() * songs.length);
+        currentSongIndex = randomIndex;
+        lyricsText.textContent = songs[currentSongIndex].lyrics;
+        userInput.value = '';
+        resultText.textContent = '';
+        checkBtn.style.display = 'inline-block';
+        nextBtn.style.display = 'none';
+        userInput.focus();
+    }
+
+    // Função para verificar a resposta do usuário
+    function checkAnswer() {
+        // Limpa a resposta do usuário, removendo espaços e pontuação
+        const cleanedUserAnswer = userInput.value.trim().toLowerCase().replace(/[^\w\s]/gi, '');
+        
+        // Limpa a resposta correta da mesma forma
+        const cleanedCorrectAnswer = songs[currentSongIndex].answer.toLowerCase().replace(/[^\w\s]/gi, '');
+
+        if (cleanedUserAnswer === cleanedCorrectAnswer) {
+            resultText.textContent = `Correto! É "${songs[currentSongIndex].answer}".`;
+            resultText.className = 'correct';
+            checkBtn.style.display = 'none';
+            nextBtn.style.display = 'inline-block';
+        } else {
+            resultText.textContent = "Ops, tente novamente.";
+            resultText.className = 'incorrect';
+        }
+    }
+
+    // Adiciona os eventos aos botões
+    checkBtn.addEventListener('click', checkAnswer);
+    nextBtn.addEventListener('click', displayRandomSong);
+
+    // Inicia o jogo
+    displayRandomSong();
+</script>
+
+</body>
+</html>
